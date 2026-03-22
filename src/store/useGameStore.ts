@@ -13,10 +13,17 @@ import {
   saveGames,
   saveSettings,
 } from "@/lib/storage";
-import { AppSettings, Game, RoundAdjustment, RoundRecord, RoundType, Ruleset } from "@/types/game";
+import {
+  AppSettings,
+  Game,
+  RoundAdjustment,
+  RoundRecord,
+  RoundType,
+  Ruleset,
+} from "@/types/game";
 import { nanoid } from "nanoid";
 import { create } from "zustand";
-import { rotateSeatsAntiClockwise } from "@/lib/score-utils";
+import { rotateSeatsAntiClockwise as rotateSeatsAntiClockwiseUtil } from "@/lib/score-utils";
 
 type CreateGameInput = {
   name?: string;
@@ -75,14 +82,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
   createGame: (input) => {
     const now = new Date().toISOString();
 
-    const players = input.players.map((name, index) => ({
+    const players: Game["players"] = input.players.map((name, index) => ({
       id: nanoid(),
       name: name.trim(),
       seat: DEFAULT_SEATS[index],
       isRiichi: false,
     }));
 
-    const playerPositions = Object.fromEntries(
+    const playerPositions: Game["playerPositions"] = Object.fromEntries(
       players.map((player, index) => [player.id, DEFAULT_POSITION_ORDER[index]])
     );
 
@@ -99,7 +106,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       playerPositions,
     };
 
-    const nextGames = [game, ...get().games];
+    const nextGames: Game[] = [game, ...get().games];
     saveGames(nextGames);
     saveActiveGameId(game.id);
 
@@ -126,7 +133,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     discarderPlayerId,
     enteredValue,
   }) => {
-    const nextGames = get().games.map((game) => {
+    const nextGames: Game[] = get().games.map((game): Game => {
       if (game.id !== gameId) return game;
 
       const round: RoundRecord = {
@@ -158,7 +165,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   undoLastRound: (gameId) => {
-    const nextGames = get().games.map((game) => {
+    const nextGames: Game[] = get().games.map((game): Game => {
       if (game.id !== gameId) return game;
       if (game.rounds.length === 0) return game;
 
@@ -174,22 +181,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   finishGame: (gameId) => {
-    const nextGames = get().games.map((game) =>
-      game.id === gameId
-        ? {
-            ...game,
-            status: "finished",
-            updatedAt: new Date().toISOString(),
-          }
-        : game
-    );
+    const nextGames: Game[] = get().games.map((game): Game => {
+      if (game.id !== gameId) return game;
+
+      return {
+        ...game,
+        status: "finished",
+        updatedAt: new Date().toISOString(),
+      };
+    });
 
     saveGames(nextGames);
     set({ games: nextGames });
   },
 
   deleteGame: (gameId) => {
-    const nextGames = get().games.filter((game) => game.id !== gameId);
+    const nextGames: Game[] = get().games.filter((game) => game.id !== gameId);
     const nextActiveGameId =
       get().activeGameId === gameId ? null : get().activeGameId;
 
@@ -203,18 +210,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   updateSettings: (partialSettings) => {
-    const nextSettings = { ...get().settings, ...partialSettings };
+    const nextSettings: AppSettings = { ...get().settings, ...partialSettings };
     saveSettings(nextSettings);
     set({ settings: nextSettings });
   },
 
   rotateSeatsAntiClockwise: (gameId) => {
-    const nextGames = get().games.map((game) => {
+    const nextGames: Game[] = get().games.map((game): Game => {
       if (game.id !== gameId) return game;
 
       return {
         ...game,
-        players: rotateSeatsAntiClockwise(game.players),
+        players: rotateSeatsAntiClockwiseUtil(game.players),
         updatedAt: new Date().toISOString(),
       };
     });
@@ -224,7 +231,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   togglePlayerRiichi: (gameId, playerId) => {
-    const nextGames = get().games.map((game) => {
+    const nextGames: Game[] = get().games.map((game): Game => {
       if (game.id !== gameId) return game;
 
       return {
