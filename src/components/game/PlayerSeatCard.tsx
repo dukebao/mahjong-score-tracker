@@ -13,37 +13,44 @@ export default function PlayerSeatCard({
   name,
   seat,
   score,
-  position,
   isRiichi,
   onToggleRiichi,
 }: PlayerSeatCardProps) {
-  const rotationClass =
-    position === "left"
-      ? "-rotate-90"
-      : position === "right"
-      ? "rotate-90"
-      : "";
+  const isEast = seat.toLowerCase() === "east";
 
-  const seatStyle =
-    seat.toLowerCase() === "east"
-      ? "bg-blue-900 text-white border-blue-950"
-      : "bg-white text-slate-900 border-slate-200";
+  const seatLabelMap: Record<string, string> = {
+    east: "東",
+    south: "南",
+    west: "西",
+    north: "北",
+  };
 
-  const labelStyle =
-    seat.toLowerCase() === "east" ? "text-blue-100" : "text-slate-500";
+  const cardStyle = isEast
+    ? "bg-[#1E3A8A] text-white"
+    : "bg-white text-slate-900";
+
+  const seatLabelStyle = isEast ? "text-blue-100" : "text-slate-500";
+
+  const riichiBadgeStyle = isRiichi
+    ? "bg-red-500 text-white"
+    : isEast
+      ? "bg-white/15 text-white"
+      : "bg-slate-100 text-slate-400";
+
+  const riichiTextStyle = isRiichi
+    ? "text-red-500"
+    : isEast
+      ? "text-white/35"
+      : "text-slate-300";
 
   return (
     <div
-      className={`relative flex min-h-[104px] min-w-[128px] items-center justify-center rounded-2xl border px-3 py-4 shadow-sm ${rotationClass} ${seatStyle}`}
+      className={`relative flex h-[112px] w-[110px] flex-col justify-between rounded-2xl p-3 shadow-sm ${cardStyle}`}
     >
       <button
         type="button"
         onClick={() => onToggleRiichi(playerId)}
-        className={`absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold ${
-          isRiichi
-            ? "border-red-700 bg-red-600 text-white"
-            : "border-slate-300 bg-white/80 text-slate-700"
-        }`}
+        className={`absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold ${riichiBadgeStyle}`}
         aria-label={`Toggle riichi for ${name}`}
         title="Riichi"
       >
@@ -51,14 +58,25 @@ export default function PlayerSeatCard({
       </button>
 
       <div className="text-center">
-        <div className={`text-xs uppercase tracking-wide ${labelStyle}`}>{seat}</div>
-        <div className="mt-1 text-lg font-semibold">{name}</div>
-        <div className="mt-2 text-2xl font-bold tabular-nums">{score}</div>
-        {isRiichi ? (
-          <div className="mt-2 text-xs font-semibold tracking-wide text-red-500">
-            RIICHI
-          </div>
-        ) : null}
+        <div
+          className={`text-[10px] font-semibold tracking-wide ${seatLabelStyle}`}
+        >
+          {seatLabelMap[seat.toLowerCase()] ?? seat}
+        </div>
+
+        <div className="mt-1 truncate text-xl font-bold leading-none">
+          {name}
+        </div>
+
+        <div className="mt-5 text-[20px] font-bold leading-none tracking-tight tabular-nums">
+          {score}
+        </div>
+      </div>
+
+      <div
+        className={`text-center text-xs font-bold tracking-wide ${riichiTextStyle}`}
+      >
+        RIICHI
       </div>
     </div>
   );

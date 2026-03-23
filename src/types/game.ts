@@ -89,10 +89,6 @@ export type Game = {
   players: Player[];
   rounds: RoundRecord[];
   playerPositions: Record<string, TablePosition>;
-
-  currentScores: Record<string, number>;
-  riichiSticks: number;
-  honba: number;
 };
 
 export type AppSettings = {
