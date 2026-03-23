@@ -83,10 +83,10 @@ export default function GamePage() {
                             <div key={round.id} className="rounded-xl border p-3">
                                 <div className="font-medium">Round {round.roundNumber}</div>
                                 <div className="mt-2 text-sm">
-                                    {round.adjustments.map((adj) => {
+                                    {round.adjustments.map((adj, index) => {
                                         const player = game.players.find((p) => p.id === adj.playerId);
                                         return (
-                                            <div key={adj.playerId} className="tabular-nums">
+                                            <div key={`${round.id}-${adj.playerId}-${index}`} className="tabular-nums">
                                                 {player?.name}: {adj.delta > 0 ? "+" : ""}
                                                 {adj.delta}
                                             </div>

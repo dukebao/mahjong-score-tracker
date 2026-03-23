@@ -83,12 +83,16 @@ export type Game = {
   name?: string;
   ruleset: Ruleset;
   startingScore: number;
-  status: GameStatus;
   createdAt: string;
   updatedAt: string;
+  status: GameStatus;
   players: Player[];
   rounds: RoundRecord[];
   playerPositions: Record<string, TablePosition>;
+
+  currentScores: Record<string, number>;
+  riichiSticks: number;
+  honba: number;
 };
 
 export type AppSettings = {

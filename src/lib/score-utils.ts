@@ -19,6 +19,7 @@ export function getCurrentScores(game: Game): Record<string, number> {
     }
   }
 
+  // Live UI preview for the current in-progress hand
   for (const player of game.players) {
     if (player.isRiichi) {
       scores[player.id] -= 1000;
@@ -29,6 +30,7 @@ export function getCurrentScores(game: Game): Record<string, number> {
 }
 
 export function getRiichiPool(game: Game): number {
+  // Live riichi pool for the current in-progress hand only
   return game.players.filter((player) => player.isRiichi).length * 1000;
 }
 

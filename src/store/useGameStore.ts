@@ -90,7 +90,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }));
 
     const playerPositions: Game["playerPositions"] = Object.fromEntries(
-      players.map((player, index) => [player.id, DEFAULT_POSITION_ORDER[index]])
+      players.map((player, index) => [
+        player.id,
+        DEFAULT_POSITION_ORDER[index],
+      ])
     );
 
     const game: Game = {
@@ -136,11 +139,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const nextGames: Game[] = get().games.map((game): Game => {
       if (game.id !== gameId) return game;
 
+      const riichiAdjustments: RoundAdjustment[] = game.players
+        .filter((player) => player.isRiichi)
+        .map((player) => ({
+          playerId: player.id,
+          delta: -1000,
+        }));
+
       const round: RoundRecord = {
         id: nanoid(),
         roundNumber: game.rounds.length + 1,
         type,
-        adjustments,
+        adjustments: [...adjustments, ...riichiAdjustments],
         note: note?.trim() || undefined,
         createdAt: new Date().toISOString(),
         riichiPoolAwarded,
@@ -210,7 +220,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   updateSettings: (partialSettings) => {
-    const nextSettings: AppSettings = { ...get().settings, ...partialSettings };
+    const nextSettings: AppSettings = {
+      ...get().settings,
+      ...partialSettings,
+    };
     saveSettings(nextSettings);
     set({ settings: nextSettings });
   },
